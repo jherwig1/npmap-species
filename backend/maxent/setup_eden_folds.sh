@@ -16,15 +16,21 @@ while read line; do
    # Skip first line
    if test $i -eq 0; then continue; fi
    species=$line
+   echo "SPECIES = $species"
    count=$(grep -w $species $COUNTS_FILE | cut -d',' -f2)
-   echo "cd $RUN_DIR; $TOOL_DIR/make_folds $RECORDS_DIR/$species.csv $count $CV_NUM_FOLDS" >> eden_folds/commands
+   echo "count = $count"
+   if [ -z "$count" ]; then
+      echo "species = $species"
+      i=$(($i -1))
+      continue
+   fi
+   echo "cd $RUN_DIR; $TOOL_DIR/make_folds $RECORDS_DIR/$species.csv $count $CV_NUM_FOLDS &" >> eden_folds/commands.sh
+
+   imod=$(($i % 20))
+   if test $imod -eq 0; then
+      echo 'wait' >> eden_folds/commands.sh
+   fi
+
 done < $CONFIG_FILE
 
-# Make PBS header file for eden run
-echo "#!/bin/sh
-#PBS -l size=32
-#PBS -j oe
-#PBS -N eden_folds
-#PBS -A $ACCOUNT
-" > eden_folds/header.pbs
-
+echo 'wait' >> eden_folds/commands.sh

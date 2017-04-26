@@ -6,11 +6,14 @@
 # MaxEnt output will go into maxent_results/
 
 mkdir eden_maxent
-mkdir maxent_results
+#mkdir maxent_results
 
 samples_dir=$RUN_DIR/training
 test_samples_dir=$RUN_DIR/test
 output_dir=$RUN_DIR/maxent_results
+input_dir=$RUN_DIR/maxent_results
+aggregate_cmd="ls"
+run_cmd="ls"
 
 # Create commands list for running MaxEnt via eden
 i=-1
@@ -21,6 +24,11 @@ while read line; do
        continue; fi
    species=$line
    fold=0
+   count=$(grep -w $species $COUNTS_FILE | cut -d',' -f2)
+   if [ -z "$count" ]; then
+      continue
+   fi
+   aggregate_cmd="$aggregate_cmd && cd $RUN_DIR; export TOOL_DIR=$TOOL_DIR; export CV_NUM_FOLDS=$CV_NUM_FOLDS; $TOOL_DIR/aggregate.sh $species && rm -rf $input_dir/$species/fold* && rm $input_dir/$species/*.dat && rm $input_dir/$species/*.bov"
    while test $fold -lt $CV_NUM_FOLDS; do
 
       flags="\
@@ -41,14 +49,21 @@ outputdirectory=$output_dir/$species/fold$fold \
 "
 
       maxent_cmd="java -Xms512m -Xmx512m -XX:-UsePerfData -jar $MAXENT_JAR $flags"
-	  asc2bov_cmd="cd $output_dir/$species/fold$fold && $TOOL_DIR/asc2bov $species.asc $species"
-      echo "mkdir -p $output_dir/$species/fold$fold && $maxent_cmd && $asc2bov_cmd" >> eden_maxent/commands
-
+      asc2bov_cmd="cd $output_dir/$species/fold$fold && $TOOL_DIR/asc2bov $species.asc $species  && rm $species.asc"
+      echo "mkdir -p $output_dir/$species/fold$fold && $maxent_cmd && $asc2bov_cmd &" >> eden_maxent/commands.sh
       fold=$(($fold + 1))
       i=$(( $i + 1 ))
+
+      imod=$(($i % 20))
+      if test $imod -eq 0; then
+         echo "wait && $aggregate_cmd &" >> eden_maxent/commands.sh
+         aggregate_cmd="ls"
+      fi
    done
 done < $CONFIG_FILE
 
+
+echo 'wait' >> eden_maxent/commands.sh
 # calculate appropriate ncpus; cap at 256
 if test $i -gt 256; then
    ncpus=256
@@ -57,14 +72,3 @@ elif test $i -gt 32; then
 else
    ncpus=32
 fi
-
-# Create PBS header file for eden run
-echo "#!/bin/sh
-#PBS -l size=$ncpus,walltime=24:00:00
-#PBS -j oe
-#PBS -N eden_maxent
-#PBS -A $ACCOUNT
-" > eden_maxent/header.pbs
-
-# Create PBS footer file for eden run
-echo "module load java" > eden_maxent/footer.pbs
