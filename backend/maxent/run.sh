@@ -7,7 +7,7 @@ echo $(date +%s) > start_secs.txt
 ./do_run.sh && \
 ./preprocess.sh && \
 ./maxent.sh &&
-#./postprocess.sh
+./postprocess.sh
 #./visit.sh
 
 echo $(date) > end_time.txt

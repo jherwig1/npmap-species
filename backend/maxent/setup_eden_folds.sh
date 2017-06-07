@@ -16,17 +16,15 @@ while read line; do
    # Skip first line
    if test $i -eq 0; then continue; fi
    species=$line
-   echo "SPECIES = $species"
    count=$(grep -w $species $COUNTS_FILE | cut -d',' -f2)
-   echo "count = $count"
-   if [ -z "$count" ]; then
-      echo "species = $species"
-      i=$(($i -1))
-      continue
-   fi
+   #if [ -z "$count" ]; then
+   #   echo "Skipping $species, count = $count"
+   #   i=$(($i -1))
+   #   continue
+   #fi
    echo "cd $RUN_DIR; $TOOL_DIR/make_folds $RECORDS_DIR/$species.csv $count $CV_NUM_FOLDS &" >> eden_folds/commands.sh
 
-   imod=$(($i % 20))
+   imod=$(($i % 30))
    if test $imod -eq 0; then
       echo 'wait' >> eden_folds/commands.sh
    fi

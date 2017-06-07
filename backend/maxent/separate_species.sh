@@ -9,7 +9,8 @@
 mkdir by_species
 
 # For each unique species name, make record file in by_species/
-for s in $(cut -d' ' -f1 $RECORD_FILE | sort -u); do
+for s in $(cut -d' ' -f1 $RECORDS_FILE | sort -u); do
+  echo $s
   if test ! -f by_species/$s.csv; then
      echo 'Species,x,y' > by_species/$s.csv
   fi

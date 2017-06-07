@@ -1,8 +1,9 @@
 import os, csv
 
 #2nd row, 11th column
-root='/home/jherwig1/npmap-species/backend/maxent/maxent_results'
-etypes = '/home/jherwig1/npmap-species/environmentallayertypes.txt'
+root='/home/jherwig1/npmap-species/backend/maxent/results/maxent_results'
+#root='/home/jherwig1/npmap-species/backend/maxent/maxent_results'
+etypes = '/home/jherwig1/npmap-species/environmentallayers/environmentallayertypes.txt'
 
 def read_csv(filename, csvwriter, species):
    start = 11
@@ -48,11 +49,11 @@ def make_csv(csvwriter):
        
 
 if __name__ == "__main__":
-   with open('output.csv', 'w') as f:
+   with open('species_stats.csv', 'w') as f:
       csvwriter = csv.writer(f)
       header = ['Species']
       with open(etypes, 'r') as f1:
          for row in f1:
-            header.append(str(row).strip('\n').strip('.asc'))
+            header.append(str(row).strip('\n')[:-4])
          csvwriter.writerow(header)
       make_csv(csvwriter)

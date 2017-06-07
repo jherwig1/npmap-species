@@ -13,14 +13,14 @@ RUN_DIR=$(pwd)
 
 #------------------------------------------------------------------------
 # Configuration settings--SET APPROPRIATE PATHS HERE FOR YOUR ENVIRONMENT
-TOOL_DIR=/home/jherwig1/npmap-species/backend/maxent
+TOOL_DIR=/mnt/data/jherwig1/npmap-species/backend/maxent
 MAXENT_JAR=$TOOL_DIR/maxent.jar
-CONFIG_FILE=/home/jherwig1/npmap-species/twincreekscode/maxent_config/config_some.txt
+CONFIG_FILE=/mnt/data/jherwig1/npmap-species/twincreekscode/maxent_config/config_one.txt
 CV_NUM_FOLDS=$(head $CONFIG_FILE -n 1)
 CV=true
-COUNTS_FILE=/home/jherwig1/npmap-species/atbirecords/ATBI_counts.txt
-RECORDS_DIR=/home/jherwig1/npmap-species/atbirecords/ATBI_files
-ENV_DIR=/home/jherwig1/npmap-species/environmentallayers/mxe
+COUNTS_FILE=/mnt/data/jherwig1/npmap-species/atbirecords/ATBI_counts.txt
+RECORDS_DIR=/mnt/data/jherwig1/npmap-species/atbirecords/ATBI_files
+ENV_DIR=/mnt/data/jherwig1/npmap-species/environmentallayers/mxe
 ENV_PICK=all
 GDAL_BIN=/home/jherwig1/gdal/bin
 GEOTIFF_DIR=$RUN_DIR/geotiffs

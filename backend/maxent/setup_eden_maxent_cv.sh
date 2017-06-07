@@ -12,8 +12,6 @@ samples_dir=$RUN_DIR/training
 test_samples_dir=$RUN_DIR/test
 output_dir=$RUN_DIR/maxent_results
 input_dir=$RUN_DIR/maxent_results
-aggregate_cmd="ls"
-run_cmd="ls"
 
 # Create commands list for running MaxEnt via eden
 i=-1
@@ -25,10 +23,9 @@ while read line; do
    species=$line
    fold=0
    count=$(grep -w $species $COUNTS_FILE | cut -d',' -f2)
-   if [ -z "$count" ]; then
-      continue
-   fi
-   aggregate_cmd="$aggregate_cmd && cd $RUN_DIR; export TOOL_DIR=$TOOL_DIR; export CV_NUM_FOLDS=$CV_NUM_FOLDS; $TOOL_DIR/aggregate.sh $species && rm -rf $input_dir/$species/fold* && rm $input_dir/$species/*.dat && rm $input_dir/$species/*.bov"
+#   if [ -z "$count" ]; then
+#      continue
+#   fi
    while test $fold -lt $CV_NUM_FOLDS; do
 
       flags="\
@@ -54,10 +51,9 @@ outputdirectory=$output_dir/$species/fold$fold \
       fold=$(($fold + 1))
       i=$(( $i + 1 ))
 
-      imod=$(($i % 20))
+      imod=$(($i % 30))
       if test $imod -eq 0; then
-         echo "wait && $aggregate_cmd &" >> eden_maxent/commands.sh
-         aggregate_cmd="ls"
+         echo "wait" >> eden_maxent/commands.sh
       fi
    done
 done < $CONFIG_FILE
